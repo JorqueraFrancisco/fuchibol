@@ -2,6 +2,9 @@ import { $, component$, useSignal, useStore } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 import { Teams } from "~/components/teams/teams";
 
+import { db } from "~/fireabase";
+import { collection, addDoc, doc, setDoc } from "firebase/firestore"; 
+
 export default component$(() => {
   const listState = useStore(
     {
@@ -26,11 +29,20 @@ export default component$(() => {
   const dateState = useSignal('2024-02-04')
   const timeState = useSignal('11:00')
 
-  const addPlayerList = $((event, team: number) => {
+  const addPlayerList =  $(async(event, team: number) => {
     if (event.key === 'Enter') {
-
       listState.players.push(event.target.value);
       playerState.value = ' '
+      try {
+        const matches = collection(db, "matches")
+        const match = addDoc(collection(matches, "partido-01"),{
+          place: "penuelas",
+          fecha: "22-02-02"
+        })
+ 
+      } catch (e) {
+        console.error("Error adding document: ", e);
+      }
     }
   })
 
@@ -53,6 +65,7 @@ export default component$(() => {
                   </select>
                   <input type="date" value={dateState.value} />
                   <input type="time" value={timeState.value} min="12:00" max="22:00" />
+                  <h4>Jugadores: {listState.players.length}</h4>
                 </div>
               </div>
               <ul id="team1List">
