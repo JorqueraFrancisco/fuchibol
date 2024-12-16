@@ -204,3 +204,29 @@ select {
 }
 
 /* LOADING END */
+
+
+/* button animation start */
+
+.mi-boton {
+    border-radius: 30px;
+    width: 40%;
+    height: 35px;
+    color: white;
+    background-color: rgb(30, 103, 238);
+    border: #000;
+    border-collapse: collapse;
+    transition: background-color 0.3s; /* Transición suave del color de fondo */
+}
+
+/* Estilo del botón al pasar el cursor */
+.mi-boton:hover {
+    background-color: #45a049; /* Cambia el color de fondo al pasar el cursor */
+}
+
+/* Estilo del botón al ser presionado */
+.mi-boton:active {
+    background-color: #3e8e41; /* Cambia el color de fondo cuando se presiona */
+}
+
+/* button animation end */
