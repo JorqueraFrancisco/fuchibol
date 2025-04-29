@@ -25,7 +25,7 @@
     "lint": "eslint \"src/**/*.ts*\"",
     "preview": "qwik build preview && vite preview --open",
     "serve": "qwik build && firebase emulators:start",
-    "start": "vite --open --mode ssr",
+    "start": "vite --open --mode ssr --host --port 8000",
     "qwik": "qwik"
   },
   "devDependencies": {
