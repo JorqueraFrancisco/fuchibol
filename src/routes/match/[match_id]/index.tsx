@@ -1,3 +1,7 @@
+import { fetchMatchAndPlayers } from "~/services/firestore/match-service";
+const { matchData, playersList } = await fetchMatchAndPlayers(match_id);
+console.log({ matchData, playersList })
+
 import {
     $,
     component$,
@@ -54,7 +58,6 @@ export default component$(() => {
 
     // States and Signals
     const showConfState = useSignal(false);
-    const location = useLocation();
     const listState = useContext(MatchListContext);
     const teamViewState = useSignal(false);
     const playerInputState = useSignal("");
@@ -64,10 +67,11 @@ export default component$(() => {
     const localeState = useSignal("");
     const dateState = useSignal("");
     const timeState = useSignal("");
-    const match_id = location.params.match_id;
+
     const teamAColor = useSignal("rojo");
     const teambColor = useSignal("#FFFFFF");
 
+    const match_id = useLocation().params.match_id; /** MATCH ID */
 
     /** Fetch player list and match details */
     const getPlayerList = $(async () => {
@@ -101,7 +105,6 @@ export default component$(() => {
         }
 
         listState.players = playersList;
-        console.log(listState.players);
     });
 
     /** Add a player to the list */
@@ -121,7 +124,6 @@ export default component$(() => {
     /** Delete a player from the list */
     const deletePlayer = $(async (id: string) => {
         listState.players = listState.players.filter((item) => item.id !== id);
-        console.log(listState.players);
         playerLoadingState.value = id;
         await deleteDoc(doc(db, "matches", match_id, "players", id));
     });
@@ -163,74 +165,13 @@ export default component$(() => {
     /** Render the component */
     return (
         <>
-            <MatchHeader action={action} localState={localeState} />
-            {/* <div class="header">
-                <h1>Lista Partido</h1>
-                {showConfState.value ?
-                    ''
-                    :
-                    <div>
-                        <p>{dateState.value}</p>
-                        <p>{timeState.value}</p>
-                        <p>{localeState.value}</p>
-                        <div>
-                            <i
-                                class="fas fa-cog"
-                                style={{ color: "#74C0FC" }}
-                                onClick$={() => (showConfState.value = true)}
-                            ></i>
-                            <div class="info"></div>
-                        </div>
-                    </div>
-
-                }
-                <div class="info">
-                    {
-                        showConfState.value ?
-                            <Form
-                                action={action}
-                                onSubmitCompleted$={(e) => {
-                                    const { place, date, time } = e.detail.value
-                                    localeState.value = place
-                                    dateState.value = date
-                                    timeState.value = time
-                                    showConfState.value = false
-                                }}
-                                class="info"
-                            >
-                                <select name="place" bind:value={localeState}>
-                                    {
-                                        matchProviderState.places.map((place, index) => (
-                                            <option key={index}>{place.locale}</option>
-                                        ))
-                                    }
-
-                                </select>
-                                <input name="date" type="date" value={dateState} />
-                                <select name="time">
-                                    <option>11:00</option>
-                                    <option>12:00</option>
-                                    <option>13:00</option>
-                                    <option>14:00</option>
-                                    <option>15:00</option>
-                                    <option>16:00</option>
-                                    <option>17:00</option>
-                                    <option>18:00</option>
-                                    <option>19:00</option>
-                                    <option>20:00</option>
-                                    <option>21:00</option>
-                                    <option>22:00</option>
-                                    <option>23:00</option>
-                                </select>
-                                <input name="match_id" type="hidden" value={match_id}></input>
-                                <button type="submit" class="">Confirmar</button>
-                                <button type="button" class="" onClick$={() => showConfState.value = false}>Cancelar</button>
-
-                            </Form> : ''
-                    }
-                    <h4>Jugadores: {listState.players.length}</h4>
-                </div>
-            </div> */}
+            <MatchHeader 
+                action={action}
+                dateState={dateState} 
+                localeState={localeState}
+                timeState={timeState}
+                match_id={match_id}
+            />
             {
                 teamViewState.value ?
                     <div>
@@ -361,9 +302,6 @@ export default component$(() => {
                                                         :
                                                         <i key={index} onClick$={() => deletePlayer(player.id)} class="fas fa-trash-alt"></i>
                                                 }
-
-
-
                                             </li>
                                         ))
                                     }

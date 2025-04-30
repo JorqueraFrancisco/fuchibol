@@ -1,30 +1,35 @@
 import {
     component$,
+    Signal,
     useContext,
     useSignal,
 } from '@builder.io/qwik';
 import { Form, useLocation } from '@builder.io/qwik-city';
 import { MatchListContext } from '~/context';
 
+interface MatchHeaderProps {
+    action: () => void;
+    localeState: Signal<string>;
+    dateState: Signal<string>;
+    timeState: Signal<string>;
+    match_id: string;
+}
 
-export const MatchHeader = component$((props: { action: any }) => {
+export const MatchHeader = component$<MatchHeaderProps>(({
+    action,
+    localeState,
+    dateState,
+    timeState,
+    match_id,
+  }) => {
 
     const showConfState = useSignal(false);
     const listState = useContext(MatchListContext);
-    const location = useLocation();
-    const match_id = location.params.match_id;
-    const { action } = props;
-
-    const localeState = useSignal('');
-    const dateState = useSignal('');
-    const timeState = useSignal('');
 
     // Solo usado localmente aquí (si lo necesitas, pasa como prop)
     const matchProviderState = useContext(MatchListContext); // Asumiendo que 'places' también está en MatchListContext
-
     return (
         <div class="header">
-            <h1>Lista Partido</h1>
             {!showConfState.value ? (
                 <div>
                     <p>{dateState.value}</p>
@@ -41,7 +46,7 @@ export const MatchHeader = component$((props: { action: any }) => {
                 </div>
             ) : (
                 <Form
-                    action={() => null} // <-- Aquí debes pasar el `useMatchForm()` como prop si es necesario
+                    action={action} // <-- Aquí debes pasar el `useMatchForm()` como prop si es necesario
                     onSubmitCompleted$={(e) => {
                         const { place, date, time } = e.detail.value;
                         localeState.value = place;
@@ -51,12 +56,12 @@ export const MatchHeader = component$((props: { action: any }) => {
                     }}
                     class="info"
                 >
-                    <select name="place" bind:value={localeState}>
+                    <select name="place" bind:value={localeState.value}>
                         {matchProviderState.places.map((place, index) => (
                             <option key={index}>{place.locale}</option>
                         ))}
                     </select>
-                    <input name="date" type="date" value={dateState} />
+                    <input name="date" type="date" value={dateState.value} />
                     <select name="time" bind:value={timeState}>
                         <option>11:00</option>
                         <option>12:00</option>
