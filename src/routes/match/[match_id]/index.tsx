@@ -1,6 +1,4 @@
 import { fetchMatchAndPlayers } from "~/services/firestore/match-service";
-const { matchData, playersList } = await fetchMatchAndPlayers(match_id);
-console.log({ matchData, playersList })
 
 import {
     $,
@@ -38,11 +36,11 @@ import { MatchHeader } from "~/components/match/match-header";
 
 /** Route action to handle match form submission */
 export const useMatchForm = routeAction$(async (data) => {
-    const { place, date, time, match_id } = data;
+    const { locale, date, time, match_id } = data;
     await setDoc(doc(db, "matches", match_id), {
         date: date,
         time: time,
-        place: place,
+        locale: locale,
     });
     return data;
 });
@@ -64,9 +62,19 @@ export default component$(() => {
     const loadingState = useSignal(false);
     const playerLoadingState = useSignal("");
 
-    const localeState = useSignal("");
-    const dateState = useSignal("");
-    const timeState = useSignal("");
+    const matchInfo = useStore({
+        locale: "",
+        date: "",
+        time: "",
+        players: [] as Player[],
+        places: [
+            { locale: "Pueblito peñuelas", cost: 28000 },
+            { locale: "Rossi", cost: 28000 },
+            { locale: "Primer tiempo", cost: 28000 },
+            { locale: "Strochi", cost: 28000 },
+            { locale: "COOOONTEXTO", cost: 28000 },
+        ],
+    });
 
     const teamAColor = useSignal("rojo");
     const teambColor = useSignal("#FFFFFF");
@@ -74,38 +82,38 @@ export default component$(() => {
     const match_id = useLocation().params.match_id; /** MATCH ID */
 
     /** Fetch player list and match details */
-    const getPlayerList = $(async () => {
-        const playersList: Player[] = [];
+    // const getPlayerList = $(async () => {
+    //     const playersList: Player[] = [];
 
-        const matchDocRef = doc(db, "matches", match_id);
-        const matchDoc = await getDoc(matchDocRef);
+    //     const matchDocRef = doc(db, "matches", match_id);
+    //     const matchDoc = await getDoc(matchDocRef);
 
-        const playersDocs = await getDocs(
-            query(
-                collection(db, `matches/${match_id}/players`),
-                orderBy("timestamp")
-            )
-        );
+    //     const playersDocs = await getDocs(
+    //         query(
+    //             collection(db, `matches/${match_id}/players`),
+    //             orderBy("timestamp")
+    //         )
+    //     );
 
-        playersDocs.forEach((doc) => {
-            playersList.push({
-                id: doc.id,
-                name: doc.data().name,
-                team: doc.data().team,
-            } as Player);
-        });
+    //     playersDocs.forEach((doc) => {
+    //         playersList.push({
+    //             id: doc.id,
+    //             name: doc.data().name,
+    //             team: doc.data().team,
+    //         } as Player);
+    //     });
 
-        if (matchDoc.exists()) {
-            localeState.value = matchDoc.data().place;
-            dateState.value = matchDoc.data().date;
-            timeState.value = matchDoc.data().time;
-            teamViewState.value = matchDoc.data().teamView;
-        } else {
-            console.log("No such document!", match_id);
-        }
+    //     if (matchDoc.exists()) {
+    //         localeState.value = matchDoc.data().place;
+    //         dateState.value = matchDoc.data().date;
+    //         timeState.value = matchDoc.data().time;
+    //         teamViewState.value = matchDoc.data().teamView;
+    //     } else {
+    //         console.log("No such document!", match_id);
+    //     }
 
-        listState.players = playersList;
-    });
+    //     listState.players = playersList;
+    // });
 
     /** Add a player to the list */
     const addPlayerList = $(async (event, team: number) => {
@@ -152,7 +160,12 @@ export default component$(() => {
 
     /** Initial data fetch */
     useTask$(async () => {
-        await getPlayerList();
+        const { matchData, playersList } = await fetchMatchAndPlayers(match_id);
+        matchInfo.players = playersList
+        Object.assign(matchInfo, matchData);
+        console.log(matchData)
+        console.log(playersList)
+        //  getPlayerList();
     });
 
     const set_team_color = (team: number, color: string) => {
@@ -167,9 +180,10 @@ export default component$(() => {
         <>
             <MatchHeader 
                 action={action}
-                dateState={dateState} 
-                localeState={localeState}
-                timeState={timeState}
+                date={matchInfo.date} 
+                locale={matchInfo.locale}
+                time={matchInfo.time}
+                places={matchInfo.places}
                 match_id={match_id}
             />
             {
@@ -293,7 +307,7 @@ export default component$(() => {
                             <div class="team">
                                 <ul>
                                     {
-                                        listState.players.map((player: Player, index) => (
+                                        matchInfo.players.map((player: Player, index) => (
                                             <li key={player.id}>
                                                 <div class="icono">{index + 1} </div> {player.name}
                                                 {

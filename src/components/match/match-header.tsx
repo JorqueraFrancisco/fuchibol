@@ -9,17 +9,19 @@ import { MatchListContext } from '~/context';
 
 interface MatchHeaderProps {
     action: () => void;
-    localeState: Signal<string>;
-    dateState: Signal<string>;
-    timeState: Signal<string>;
+    locale: Signal<string>;
+    date: Signal<string>;
+    time: Signal<string>;
+    places: [];
     match_id: string;
 }
 
 export const MatchHeader = component$<MatchHeaderProps>(({
     action,
-    localeState,
-    dateState,
-    timeState,
+    locale,
+    date,
+    time,
+    places,
     match_id,
   }) => {
 
@@ -32,9 +34,9 @@ export const MatchHeader = component$<MatchHeaderProps>(({
         <div class="header">
             {!showConfState.value ? (
                 <div>
-                    <p>{dateState.value}</p>
-                    <p>{timeState.value}</p>
-                    <p>{localeState.value}</p>
+                    <p>{date}</p>
+                    <p>{time}</p>
+                    <p>{locale}</p>
                     <div>
                         <i
                             class="fas fa-cog"
@@ -48,21 +50,24 @@ export const MatchHeader = component$<MatchHeaderProps>(({
                 <Form
                     action={action} // <-- Aquí debes pasar el `useMatchForm()` como prop si es necesario
                     onSubmitCompleted$={(e) => {
-                        const { place, date, time } = e.detail.value;
-                        localeState.value = place;
-                        dateState.value = date;
-                        timeState.value = time;
+                        console.log(e.detail.value)
+                        console.log(showConfState.value)
+                        const { newLocale, newDate, newTime } = e.detail.value;
+                        locale.value = newLocale;
+                        date.value = newDate;
+                        time.value = newTime;
                         showConfState.value = false;
+                        console.log(showConfState.value)
                     }}
                     class="info"
                 >
-                    <select name="place" bind:value={localeState.value}>
-                        {matchProviderState.places.map((place, index) => (
+                    <select name="locale" bind:value={locale}>
+                        {places.map((place, index) => (
                             <option key={index}>{place.locale}</option>
                         ))}
                     </select>
-                    <input name="date" type="date" value={dateState.value} />
-                    <select name="time" bind:value={timeState}>
+                    <input name="date" type="date" value={date} />
+                    <select name="time" bind:value={time}>
                         <option>11:00</option>
                         <option>12:00</option>
                         <option>13:00</option>
