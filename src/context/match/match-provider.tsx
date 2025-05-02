@@ -6,6 +6,9 @@ import { MatchListContext, type MatchListState } from "./match-list.context";
 export const MatchProvider = component$(() => {
 
     const listState = useStore<MatchListState>({
+        locale: "",
+        date: "",
+        time: "",
         players: [],
         places: [
             { locale: "Pueblito peñuelas", cost: 28000 },

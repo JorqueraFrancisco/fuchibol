@@ -1,5 +1,3 @@
-import { fetchMatchAndPlayers } from "~/services/firestore/match-service";
-
 import {
     $,
     component$,
@@ -32,6 +30,11 @@ import {
 } from "firebase/firestore";
 import { MatchListContext } from "~/context";
 import { MatchHeader } from "~/components/match/match-header";
+import {
+    fetchMatchAndPlayers,
+    addPlayer,
+    removePlayer,
+} from "~/services/firestore/match-service";
 
 
 /** Route action to handle match form submission */
@@ -45,6 +48,12 @@ export const useMatchForm = routeAction$(async (data) => {
     return data;
 });
 
+// El use signal se puede modificar desde el componente hijo mediante el uso de Signal 
+// en la interface del prop del componente hijo, en cambio el use store no se puede 
+// modificar desde el componente hijo, por lo que es mejor usar el use signal 
+// para los estados que se van a modificar desde el componente hijo. 
+// O usar el useContext para compartir el estado entre componentes.
+
 /** Main Component */
 export default component$(() => {
     // Interfaces
@@ -56,25 +65,12 @@ export default component$(() => {
 
     // States and Signals
     const showConfState = useSignal(false);
-    const listState = useContext(MatchListContext);
     const teamViewState = useSignal(false);
     const playerInputState = useSignal("");
     const loadingState = useSignal(false);
     const playerLoadingState = useSignal("");
 
-    const matchInfo = useStore({
-        locale: "",
-        date: "",
-        time: "",
-        players: [] as Player[],
-        places: [
-            { locale: "Pueblito peñuelas", cost: 28000 },
-            { locale: "Rossi", cost: 28000 },
-            { locale: "Primer tiempo", cost: 28000 },
-            { locale: "Strochi", cost: 28000 },
-            { locale: "COOOONTEXTO", cost: 28000 },
-        ],
-    });
+    const matchInfo = useContext(MatchListContext);
 
     const teamAColor = useSignal("rojo");
     const teambColor = useSignal("#FFFFFF");
@@ -112,33 +108,40 @@ export default component$(() => {
     //         console.log("No such document!", match_id);
     //     }
 
-    //     listState.players = playersList;
+    //     matchInfo.players = playersList;
     // });
 
     /** Add a player to the list */
     const addPlayerList = $(async (event, team: number) => {
         if (event.key === "Enter") {
             loadingState.value = true;
-            playerInputState.value = "";
-            await addDoc(collection(db, `matches/${match_id}/players`), {
+
+            const docRef = await addPlayer(
+                match_id,
+                event.target.value,
+            );
+
+            matchInfo.players.push({
+                id: docRef.id,
                 name: event.target.value,
+                team: 0,
                 timestamp: serverTimestamp(),
-            });
-            await getPlayerList();
+            } as Player);
+
             loadingState.value = false;
         }
     });
 
     /** Delete a player from the list */
-    const deletePlayer = $(async (id: string) => {
-        listState.players = listState.players.filter((item) => item.id !== id);
-        playerLoadingState.value = id;
-        await deleteDoc(doc(db, "matches", match_id, "players", id));
+    const deletePlayer = $(async (player_id: string) => {
+        matchInfo.players = matchInfo.players.filter((item) => item.id !== player_id);
+        playerLoadingState.value = player_id;
+        await removePlayer(match_id, player_id);
     });
 
     /** Generate teams from players */
     const createTeams = $(async () => {
-        const players = listState.players;
+        const players = matchInfo.players;
 
         players.sort(() => Math.random() - 0.5);
 
@@ -150,7 +153,7 @@ export default component$(() => {
             player.team = team;
         });
 
-        listState.players = players;
+        matchInfo.players = players;
         updateDoc(doc(db, "matches", match_id), {
             teamView: true,
         });
@@ -160,11 +163,13 @@ export default component$(() => {
 
     /** Initial data fetch */
     useTask$(async () => {
+
+        console.log("Fetching match data...");
+
         const { matchData, playersList } = await fetchMatchAndPlayers(match_id);
         matchInfo.players = playersList
         Object.assign(matchInfo, matchData);
-        console.log(matchData)
-        console.log(playersList)
+        loadingState.value = false;
         //  getPlayerList();
     });
 
@@ -178,12 +183,8 @@ export default component$(() => {
     /** Render the component */
     return (
         <>
-            <MatchHeader 
+            <MatchHeader
                 action={action}
-                date={matchInfo.date} 
-                locale={matchInfo.locale}
-                time={matchInfo.time}
-                places={matchInfo.places}
                 match_id={match_id}
             />
             {
@@ -219,7 +220,7 @@ export default component$(() => {
                                 </div>
                                 <ul>
                                     {
-                                        listState.players.map((player: Player, index) => (
+                                        matchInfo.players.map((player: Player, index) => (
                                             <div key={player.id}>
 
                                                 {
@@ -269,7 +270,7 @@ export default component$(() => {
                                 </div>
                                 <ul>
                                     {
-                                        listState.players.map((player: Player, index) => (
+                                        matchInfo.players.map((player: Player, index) => (
                                             <div key={player.id}>
                                                 {
                                                     player.team == 2 ?

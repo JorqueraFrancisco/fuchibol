@@ -9,34 +9,24 @@ import { MatchListContext } from '~/context';
 
 interface MatchHeaderProps {
     action: () => void;
-    locale: Signal<string>;
-    date: Signal<string>;
-    time: Signal<string>;
-    places: [];
     match_id: string;
 }
 
 export const MatchHeader = component$<MatchHeaderProps>(({
     action,
-    locale,
-    date,
-    time,
-    places,
     match_id,
   }) => {
 
     const showConfState = useSignal(false);
-    const listState = useContext(MatchListContext);
+    const matchInfo = useContext(MatchListContext);
 
-    // Solo usado localmente aquí (si lo necesitas, pasa como prop)
-    const matchProviderState = useContext(MatchListContext); // Asumiendo que 'places' también está en MatchListContext
     return (
         <div class="header">
             {!showConfState.value ? (
                 <div>
-                    <p>{date}</p>
-                    <p>{time}</p>
-                    <p>{locale}</p>
+                    <p>{matchInfo.date}</p>
+                    <p>{matchInfo.time}</p>
+                    <p>{matchInfo.locale}</p>
                     <div>
                         <i
                             class="fas fa-cog"
@@ -50,24 +40,21 @@ export const MatchHeader = component$<MatchHeaderProps>(({
                 <Form
                     action={action} // <-- Aquí debes pasar el `useMatchForm()` como prop si es necesario
                     onSubmitCompleted$={(e) => {
-                        console.log(e.detail.value)
-                        console.log(showConfState.value)
-                        const { newLocale, newDate, newTime } = e.detail.value;
-                        locale.value = newLocale;
-                        date.value = newDate;
-                        time.value = newTime;
+                        const { locale, date, time } = e.detail.value;
+                        matchInfo.locale = locale;
+                        matchInfo.date = date;
+                        matchInfo.time = time;
                         showConfState.value = false;
-                        console.log(showConfState.value)
                     }}
                     class="info"
                 >
-                    <select name="locale" bind:value={locale}>
-                        {places.map((place, index) => (
+                    <select name="locale" bind:value={matchInfo.locale}>
+                        {matchInfo.places.map((place, index) => (
                             <option key={index}>{place.locale}</option>
                         ))}
                     </select>
-                    <input name="date" type="date" value={date} />
-                    <select name="time" bind:value={time}>
+                    <input name="date" type="date" value={matchInfo.date} />
+                    <select name="time" bind:value={matchInfo.time}>
                         <option>11:00</option>
                         <option>12:00</option>
                         <option>13:00</option>
@@ -89,7 +76,7 @@ export const MatchHeader = component$<MatchHeaderProps>(({
                     </button>
                 </Form>
             )}
-            <h4>Jugadores: {listState.players.length}</h4>
+            <h4>Jugadores: {matchInfo.players.length}</h4>
         </div>
     );
 });

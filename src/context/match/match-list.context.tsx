@@ -7,8 +7,11 @@ export interface Player {
 }
 
 export interface MatchListState {
+  locale: string;
+  date: string;
+  time: string;
   players: Player[];
   places: { locale: string; cost: number }[];
 }
 
-export const MatchListContext = createContextId<MatchListState>('match.list-context');
+export const MatchListContext = createContextId<MatchListState>('match.list-context'); 
