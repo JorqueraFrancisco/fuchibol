@@ -34,7 +34,9 @@ import {
     fetchMatchAndPlayers,
     addPlayer,
     removePlayer,
+    assignTeams,
 } from "~/services/firestore/match-service";
+import { Console } from "console";
 
 
 /** Route action to handle match form submission */
@@ -125,7 +127,6 @@ export default component$(() => {
                 id: docRef.id,
                 name: event.target.value,
                 team: 0,
-                timestamp: serverTimestamp(),
             } as Player);
 
             loadingState.value = false;
@@ -143,22 +144,14 @@ export default component$(() => {
     const createTeams = $(async () => {
         const players = matchInfo.players;
 
-        players.sort(() => Math.random() - 0.5);
-
         players.forEach((player, index) => {
             const team = index % 2 === 0 ? 1 : 2;
-            updateDoc(doc(db, "matches", match_id, "players", player.id), {
-                team: team,
-            });
             player.team = team;
         });
 
+        await assignTeams(match_id, players);
         matchInfo.players = players;
-        updateDoc(doc(db, "matches", match_id), {
-            teamView: true,
-        });
         teamViewState.value = true;
-
     });
 
     /** Initial data fetch */
@@ -169,8 +162,13 @@ export default component$(() => {
         const { matchData, playersList } = await fetchMatchAndPlayers(match_id);
         matchInfo.players = playersList
         Object.assign(matchInfo, matchData);
+        const hasTeamAssigned = matchInfo.players.some(
+            player => player.team === 1 || player.team === 2
+        );
+        console.log("hasTeamAssigned", hasTeamAssigned);
+        teamViewState.value = hasTeamAssigned;
         loadingState.value = false;
-        //  getPlayerList();
+
     });
 
     const set_team_color = (team: number, color: string) => {

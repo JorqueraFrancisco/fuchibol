@@ -59,16 +59,11 @@ export const removePlayer = async (match_id: string, player_id: string) => {
 
 // Actualizar equipos
 export const assignTeams = async (match_id: string, players: Player[]) => {
-  players.sort(() => Math.random() - 0.5);
-
-  for (let i = 0; i < players.length; i++) {
-    const team = i % 2 === 0 ? 1 : 2;
-    players[i].team = team;
-
-    await updateDoc(doc(db, 'matches', match_id, 'players', players[i].id), {
-      team,
+  players.forEach((player, index) => {
+    updateDoc(doc(db, 'matches', match_id, 'players', player.id), {
+      team: player.team,
     });
-  }
+  })
 
   await updateDoc(doc(db, 'matches', match_id), {
     teamView: true,
