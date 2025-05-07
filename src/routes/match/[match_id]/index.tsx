@@ -37,6 +37,7 @@ import {
     assignTeams,
 } from "~/services/firestore/match-service";
 import { Console } from "console";
+import { MatchTeam } from "~/components/match/match-team";
 
 
 /** Route action to handle match form submission */
@@ -69,8 +70,8 @@ export default component$(() => {
     const showConfState = useSignal(false);
     const teamViewState = useSignal(false);
     const playerInputState = useSignal("");
-    const loadingState = useSignal(false);
-    const playerLoadingState = useSignal("");
+    const loadingState = useSignal(false); // remover
+    const playerLoadingState = useSignal(""); //remover
 
     const matchInfo = useContext(MatchListContext);
 
@@ -113,32 +114,6 @@ export default component$(() => {
     //     matchInfo.players = playersList;
     // });
 
-    /** Add a player to the list */
-    const addPlayerList = $(async (event, team: number) => {
-        if (event.key === "Enter") {
-            loadingState.value = true;
-
-            const docRef = await addPlayer(
-                match_id,
-                event.target.value,
-            );
-
-            matchInfo.players.push({
-                id: docRef.id,
-                name: event.target.value,
-                team: 0,
-            } as Player);
-
-            loadingState.value = false;
-        }
-    });
-
-    /** Delete a player from the list */
-    const deletePlayer = $(async (player_id: string) => {
-        matchInfo.players = matchInfo.players.filter((item) => item.id !== player_id);
-        playerLoadingState.value = player_id;
-        await removePlayer(match_id, player_id);
-    });
 
     /** Generate teams from players */
     const createTeams = $(async () => {
@@ -184,6 +159,7 @@ export default component$(() => {
             <MatchHeader
                 action={action}
                 match_id={match_id}
+                teamViewState={teamViewState}
             />
             {
                 teamViewState.value ?
@@ -303,32 +279,10 @@ export default component$(() => {
                     :
                     <div>
                         <div class="container">
-                            <div class="team">
-                                <ul>
-                                    {
-                                        matchInfo.players.map((player: Player, index) => (
-                                            <li key={player.id}>
-                                                <div class="icono">{index + 1} </div> {player.name}
-                                                {
-                                                    playerLoadingState.value == player.id ?
-                                                        <i class="fa fa-refresh fa-spin"></i>
-                                                        :
-                                                        <i key={index} onClick$={() => deletePlayer(player.id)} class="fas fa-trash-alt"></i>
-                                                }
-                                            </li>
-                                        ))
-                                    }
-                                </ul>
-                                {loadingState.value ?
-                                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-                                    :
-                                    <input
-                                        onKeyDown$={(event) => addPlayerList(event, 1)}
-                                        type="text"
-                                        placeholder="Agregar jugador"
-                                    />}
-
-                            </div>
+                            <MatchTeam
+                                match_id={match_id}
+                                teamViewState={teamViewState}
+                            />
                             <button
                                 class="mi-boton"
                                 onClick$={() => createTeams()}

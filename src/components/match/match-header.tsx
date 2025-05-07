@@ -10,11 +10,13 @@ import { MatchListContext } from '~/context';
 interface MatchHeaderProps {
     action: () => void;
     match_id: string;
+    teamViewState: Signal<boolean>;
 }
 
 export const MatchHeader = component$<MatchHeaderProps>(({
     action,
     match_id,
+    teamViewState,
   }) => {
 
     const showConfState = useSignal(false);
@@ -35,6 +37,7 @@ export const MatchHeader = component$<MatchHeaderProps>(({
                         ></i>
                         <div class="info"></div>
                     </div>
+                    <button  onClick$={() => teamViewState.value = !teamViewState.value}>Cambiar vista</button>
                 </div>
             ) : (
                 <Form
