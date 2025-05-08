@@ -192,38 +192,11 @@ export default component$(() => {
                                         </select>
                                     </div>
                                 </div>
-                                <ul>
-                                    {
-                                        matchInfo.players.map((player: Player, index) => (
-                                            <div key={player.id}>
-
-                                                {
-                                                    player.team == 1 ?
-                                                        <li key={player.id}>
-
-                                                            <div class="icono">{index + 1} </div> {player.name}
-                                                            {
-                                                                playerLoadingState.value == player.id ?
-                                                                    <i class="fa fa-refresh fa-spin"></i>
-                                                                    :
-                                                                    <i key={index} onClick$={() => deletePlayer(player.id)} class="fas fa-trash-alt"></i>
-                                                            }
-                                                        </li>
-                                                        : ""
-                                                }
-                                            </div>
-                                        ))
-                                    }
-                                </ul>
-                                {loadingState.value ?
-                                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-                                    :
-                                    <input
-                                        onKeyDown$={(event) => addPlayerList(event, 1)}
-                                        type="text"
-                                        placeholder="Agregar jugador"
-                                    />}
-
+                                <MatchTeam
+                                    match_id={match_id}
+                                    teamViewState={teamViewState}
+                                    team={1}
+                                />
 
                             </div>
                             <div class="team" id="team2">
@@ -242,36 +215,11 @@ export default component$(() => {
                                         </select>
                                     </div>
                                 </div>
-                                <ul>
-                                    {
-                                        matchInfo.players.map((player: Player, index) => (
-                                            <div key={player.id}>
-                                                {
-                                                    player.team == 2 ?
-                                                        <li key={player.id}>
-                                                            <div class="icono">{index + 1} </div> {player.name}
-                                                            {
-                                                                playerLoadingState.value == player.id ?
-                                                                    <i class="fa fa-refresh fa-spin"></i>
-                                                                    :
-                                                                    <i key={index} onClick$={() => deletePlayer(player.id)} class="fas fa-trash-alt"></i>
-                                                            }
-                                                        </li>
-                                                        : ""
-                                                }
-                                            </div>
-                                        ))
-                                    }
-                                </ul>
-                                {loadingState.value ?
-                                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-                                    :
-                                    <input
-                                        onKeyDown$={(event) => addPlayerList(event, 2)}
-                                        type="text"
-                                        placeholder="Agregar jugador"
-                                    />}
-
+                                <MatchTeam
+                                    match_id={match_id}
+                                    teamViewState={teamViewState}
+                                    team={2}
+                                />
 
                             </div>
                         </div>

@@ -5,11 +5,13 @@ import { addPlayer, removePlayer } from '~/services/firestore/match-service';
 interface MatchTeamProps {
     match_id: string;
     teamViewState: Signal<boolean>;
+    team?: number;
 }
 
 export const MatchTeam = component$<MatchTeamProps>(({
     match_id,
     teamViewState,
+    team,
 }) => {
 
     const loadingState = useSignal(false);
@@ -47,17 +49,23 @@ export const MatchTeam = component$<MatchTeamProps>(({
         <div class="team">
             <ul>
                 {
-                    matchInfo.players.map((player: Player, index) => (
-                        <li key={player.id}>
-                            <div class="icono">{index + 1} </div> {player.name}
-                            {
-                                playerLoadingState.value == player.id ?
-                                    <i class="fa fa-refresh fa-spin"></i>
-                                    :
-                                    <i key={index} onClick$={() => deletePlayer(player.id)} class="fas fa-trash-alt"></i>
-                            }
-                        </li>
-                    ))
+                    matchInfo.players
+                        .filter((player: Player) => team === null || team === undefined || player.team === team)
+                        .map((player: Player, index) => (
+                            <li key={player.id}>
+                                <div class="icono">{index + 1}</div> {player.name}
+                                {
+                                    playerLoadingState.value == player.id ?
+                                        <i class="fa fa-refresh fa-spin"></i>
+                                        :
+                                        team === null || team === undefined ?
+                                            <i key={index} onClick$={() => deletePlayer(player.id)} class="fas fa-trash-alt"></i>
+                                            :
+                                            ""
+
+                                }
+                            </li>
+                        ))
                 }
             </ul>
             {loadingState.value ?
