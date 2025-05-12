@@ -52,7 +52,7 @@ export const MatchTeam = component$<MatchTeamProps>(({
                     matchInfo.players
                         .filter((player: Player) => team === null || team === undefined || player.team === team)
                         .map((player: Player, index) => (
-                            <li key={player.id}>
+                            <li key={player.id} >
                                 <div class="icono">{index + 1}</div> {player.name}
                                 {
                                     playerLoadingState.value == player.id ?

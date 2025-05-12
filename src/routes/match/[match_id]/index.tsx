@@ -165,7 +165,6 @@ export default component$(() => {
                 teamViewState.value ?
                     <div>
                         <div class="container">
-                            <div class="team" id="team1">
                                 <div class="team-header container">
                                     <h2>Equipo 1</h2>
                                     <div class="container-team-name">
@@ -197,9 +196,7 @@ export default component$(() => {
                                     teamViewState={teamViewState}
                                     team={1}
                                 />
-
-                            </div>
-                            <div class="team" id="team2">
+                          
                                 <div class="team-header container">
                                     <h2>Equipo 2</h2>
                                     <div class="container-team-name">
@@ -221,7 +218,6 @@ export default component$(() => {
                                     team={2}
                                 />
 
-                            </div>
                         </div>
                     </div>
                     :
