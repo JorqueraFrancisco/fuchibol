@@ -36,7 +36,6 @@ import {
     removePlayer,
     assignTeams,
 } from "~/services/firestore/match-service";
-import { Console } from "console";
 import { MatchTeam } from "~/components/match/match-team";
 
 
@@ -67,11 +66,8 @@ export default component$(() => {
     }
 
     // States and Signals
-    const showConfState = useSignal(false);
     const teamViewState = useSignal(false);
-    const playerInputState = useSignal("");
     const loadingState = useSignal(false); // remover
-    const playerLoadingState = useSignal(""); //remover
 
     const matchInfo = useContext(MatchListContext);
 
@@ -79,41 +75,6 @@ export default component$(() => {
     const teambColor = useSignal("#FFFFFF");
 
     const match_id = useLocation().params.match_id; /** MATCH ID */
-
-    /** Fetch player list and match details */
-    // const getPlayerList = $(async () => {
-    //     const playersList: Player[] = [];
-
-    //     const matchDocRef = doc(db, "matches", match_id);
-    //     const matchDoc = await getDoc(matchDocRef);
-
-    //     const playersDocs = await getDocs(
-    //         query(
-    //             collection(db, `matches/${match_id}/players`),
-    //             orderBy("timestamp")
-    //         )
-    //     );
-
-    //     playersDocs.forEach((doc) => {
-    //         playersList.push({
-    //             id: doc.id,
-    //             name: doc.data().name,
-    //             team: doc.data().team,
-    //         } as Player);
-    //     });
-
-    //     if (matchDoc.exists()) {
-    //         localeState.value = matchDoc.data().place;
-    //         dateState.value = matchDoc.data().date;
-    //         timeState.value = matchDoc.data().time;
-    //         teamViewState.value = matchDoc.data().teamView;
-    //     } else {
-    //         console.log("No such document!", match_id);
-    //     }
-
-    //     matchInfo.players = playersList;
-    // });
-
 
     /** Generate teams from players */
     const createTeams = $(async () => {

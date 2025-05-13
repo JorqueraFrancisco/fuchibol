@@ -71,6 +71,9 @@ export const MatchTeam = component$<MatchTeamProps>(({
             {loadingState.value ?
                 <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
                 :
+                teamViewState.value ?
+                    ""
+                    :
                 <input
                     onKeyDown$={(event) => addPlayerList(event, 1)}
                     type="text"
