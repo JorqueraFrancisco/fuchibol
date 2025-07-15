@@ -129,27 +129,6 @@ export default component$(() => {
                                 <div class="team-header container">
                                     <h2>Equipo 1</h2>
                                     <div class="container-team-name">
-                                        <div class="color-box" id="colorBox1"></div>
-                                        <select id="colorPicker1" bind:value={teamAColor}>
-                                            <option value="#FFFFFF">Blanco</option>
-                                            <option value="#FF0000">Rojo</option>
-                                            <option value="#0000FF">Azul</option>
-                                            <option value="#FFFF00">Amarillo</option>
-                                            <option value="#008000">Verde</option>
-                                            <option value="#A52A2A">Café</option>
-                                            <option value="#000000">Negro</option>
-                                        </select>
-
-
-                                        <select id="colorPicker1">
-                                            <option value="#FFFFFF">Blanco</option>
-                                            <option value="#FF0000">Rojo</option>
-                                            <option value="#0000FF">Azul</option>
-                                            <option value="#FFFF00">Amarillo</option>
-                                            <option value="#008000">Verde</option>
-                                            <option value="#A52A2A">Café</option>
-                                            <option value="#000000">Negro</option>
-                                        </select>
                                     </div>
                                 </div>
                                 <MatchTeam

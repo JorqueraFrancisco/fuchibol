@@ -231,3 +231,27 @@ select {
 }
 
 /* button animation end */
+
+.camiseta {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    background-color: var(--color-camiseta, #3498db); /* color por defecto */
+    clip-path: polygon(
+      20% 0%, 40% 0%, 45% 10%, 55% 10%, 60% 0%, 80% 0%, 
+      100% 20%, 80% 40%, 80% 100%, 20% 100%, 20% 40%, 0% 20%
+    );
+    margin: 20px auto;
+  }
+
+  .camiseta.roja {
+    --color-camiseta: #e74c3c;
+  }
+
+  .camiseta.verde {
+    --color-camiseta: #2ecc71;
+  }
+
+  .camiseta.amarilla {
+    --color-camiseta: #f1c40f;
+  }

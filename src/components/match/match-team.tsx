@@ -47,6 +47,7 @@ export const MatchTeam = component$<MatchTeamProps>(({
 
     return (
         <div class="team">
+            <div class="camiseta verde"></div>
             <ul>
                 {
                     matchInfo.players
